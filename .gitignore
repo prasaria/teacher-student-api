@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+
+# logs
+logs/
+*.log
+npm-debug.log*
+
+# environment
+.env
+
+# testing
+coverage/
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+.DS_Store
