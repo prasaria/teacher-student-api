@@ -18,4 +18,9 @@ app.use('/api', apiRoutes);
 // Error handling
 app.use(errorHandler);
 
+// Handle 404 routes
+app.use((_req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
 export default app;
