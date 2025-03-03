@@ -5,38 +5,49 @@ import { students } from './student';
 import { relations } from 'drizzle-orm';
 
 // Many-to-many relationship table between teachers and students
-export const teacherStudents = mysqlTable('teacher_students', {
-    teacherId: int('teacher_id').notNull().references(() => teachers.id, { 
+export const teacherStudents = mysqlTable(
+  'teacher_students',
+  {
+    teacherId: int('teacher_id')
+      .notNull()
+      .references(() => teachers.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
-    }),
-    studentId: int('student_id').notNull().references(() => students.id, {
+      }),
+    studentId: int('student_id')
+      .notNull()
+      .references(() => students.id, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
-    }),
+      }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => {
+  },
+  (table) => {
     return {
-        pk: primaryKey({ columns: [table.teacherId, table.studentId] }),
+      pk: primaryKey({ columns: [table.teacherId, table.studentId] }),
     };
-});
+  }
+);
 
 // Define schema relations for easier querying
 export const teachersRelations = relations(teachers, ({ many }) => ({
-    students: many(teacherStudents),
+  students: many(teacherStudents),
 }));
 
 export const studentsRelations = relations(students, ({ many }) => ({
-    teachers: many(teacherStudents),
+  teachers: many(teacherStudents),
 }));
 
-export const teacherStudentsRelations = relations(teacherStudents, ({ one }) => ({
+export const teacherStudentsRelations = relations(
+  teacherStudents,
+  ({ one }) => ({
     teacher: one(teachers, {
-        fields: [teacherStudents.teacherId],
-        references: [teachers.id],
+      fields: [teacherStudents.teacherId],
+      references: [teachers.id],
     }),
     student: one(students, {
-        fields: [teacherStudents.studentId],
-        references: [students.id],
+      fields: [teacherStudents.studentId],
+      references: [students.id],
     }),
-}));
+  })
+);
