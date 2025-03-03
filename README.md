@@ -13,8 +13,11 @@ A RESTful API for managing teacher-student relationships and notifications, buil
 
 - Node.js 20+
 - MySQL 8+
+- Docker (If you want to run the app using containerization)
 
 ## Installation
+
+### Without Docker
 
 ```bash
 # Clone the repository
@@ -37,6 +40,56 @@ npm run db:seed
 
 # Start the server
 npm run dev
+```
+
+### With Docker
+
+```bash
+# Build and start the Docker containers in detached mode
+docker-compose up --build -d
+
+# Check if containers are running
+docker-compose ps
+
+# Check application logs
+docker-compose logs app
+
+# Check database logs
+docker-compose logs db
+
+# Generate migrations
+docker-compose exec app npm run db:generate
+
+# Apply migrations
+docker-compose exec app npm run db:migrate
+
+# Seed the database
+docker-compose exec app npm run db:seed
+
+# Connect to MySQL inside the database container
+docker-compose exec db mysql -u root -ppassword teacher_student
+
+# Inside MySQL, list tables
+SHOW TABLES;
+
+# Examine table structure
+DESCRIBE teachers;
+DESCRIBE students;
+DESCRIBE teacher_students;
+
+# Check seed data
+SELECT * FROM teachers;
+SELECT * FROM students;
+SELECT * FROM teacher_students;
+
+# Exit MySQL
+EXIT;
+
+# Endpoint health check
+curl http://localhost:3000/health
+
+# Stop existing containers
+docker-compose down
 ```
 
 ## API Documentation
