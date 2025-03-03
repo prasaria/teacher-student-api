@@ -86,7 +86,7 @@ SELECT * FROM teacher_students;
 EXIT;
 
 # Endpoint health check
-curl http://localhost:3000/health
+curl http://localhost:3000/api/health
 
 # Stop existing containers
 docker-compose down
