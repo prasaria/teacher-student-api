@@ -3,23 +3,13 @@ import { Request, Response } from 'express';
 import { teacherService } from '../../../services/teacher.service';
 import asyncHandler from 'express-async-handler';
 import { BadRequestError, NotFoundError } from '../../../utils/error';
-import {
-  registerStudentsSchema,
-  commonStudentsSchema,
-  suspendStudentSchema,
-  retrieveForNotificationsSchema,
-} from '../validations/teacher.validation';
 
 // 1. Register students endpoint
 export const registerStudents = asyncHandler(
   async (req: Request, res: Response) => {
-    const { success, error, data } = registerStudentsSchema.safeParse(req.body);
+    const { teacher, students } = req.body;
 
-    if (!success) {
-      throw new BadRequestError(error.message);
-    }
-
-    await teacherService.registerStudents(data.teacher, data.students);
+    await teacherService.registerStudents(teacher, students);
 
     res.status(204).send();
   }
@@ -28,9 +18,13 @@ export const registerStudents = asyncHandler(
 // 2. Get common students endpoint
 export const getCommonStudents = asyncHandler(
   async (req: Request, res: Response) => {
+    // We know teacherParam is defined,
+    // but we still need to handle TypeScript's type checking
     const teacherParam = req.query.teacher;
 
     if (!teacherParam) {
+      // This check is actually redundant due to validation middleware,
+      // but it helps TypeScript understand the value is defined
       throw new BadRequestError('Teacher parameter is required');
     }
 
@@ -49,18 +43,14 @@ export const getCommonStudents = asyncHandler(
 // 3. Suspend student endpoint
 export const suspendStudent = asyncHandler(
   async (req: Request, res: Response) => {
-    const { success, error, data } = suspendStudentSchema.safeParse(req.body);
-
-    if (!success) {
-      throw new BadRequestError(error.message);
-    }
+    const { student } = req.body;
 
     try {
-      await teacherService.suspendStudent(data.student);
+      await teacherService.suspendStudent(student);
       res.status(204).send();
     } catch (err) {
       if (err instanceof NotFoundError) {
-        throw new BadRequestError(err.message);
+        throw err; // Let the error middleware handle it
       }
       throw err;
     }
@@ -70,24 +60,18 @@ export const suspendStudent = asyncHandler(
 // 4. Retrieve notification recipients endpoint
 export const retrieveForNotifications = asyncHandler(
   async (req: Request, res: Response) => {
-    const { success, error, data } = retrieveForNotificationsSchema.safeParse(
-      req.body
-    );
-
-    if (!success) {
-      throw new BadRequestError(error.message);
-    }
+    const { teacher, notification } = req.body;
 
     try {
       const recipients = await teacherService.getNotificationRecipients(
-        data.teacher,
-        data.notification
+        teacher,
+        notification
       );
 
       res.status(200).json({ recipients });
     } catch (err) {
       if (err instanceof NotFoundError) {
-        throw new BadRequestError(err.message);
+        throw err; // Let the error middleware handle it
       }
       throw err;
     }
